@@ -1,14 +1,21 @@
 "use client";
 
+/**
+ * Dropdown for choosing one model. Options are grouped by provider and show
+ * input/output pricing per 1M tokens so cost is visible before running.
+ */
 import type { ModelConfig } from "@/types";
 
 interface ModelSelectorProps {
+  /** Currently selected OpenRouter model ID. */
   value: string;
   onChange: (value: string) => void;
   label: string;
+  /** Full catalog to choose from. */
   models: ModelConfig[];
 }
 
+/** Formats prices as "$input/$output per 1M". Catalog prices are per 1K tokens. */
 function formatPrice(m: ModelConfig) {
   const fmt = (n: number) => `$${(n * 1000).toFixed(2)}`;
   return `${fmt(m.inputPer1k)}/${fmt(m.outputPer1k)} per 1M`;
@@ -27,7 +34,9 @@ export default function ModelSelector({
     groups.set(provider, [...(groups.get(provider) ?? []), m]);
   }
 
-  // Keep the current selection renderable even if it's missing from the list
+  // The catalog loads asynchronously. Until it arrives, or if the selected ID
+  // has been retired, render the raw ID as an extra option so the <select>
+  // always has a valid value to show.
   const known = models.some((m) => m.id === value);
 
   return (

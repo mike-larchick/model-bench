@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   turbopack: {
     rules: {
+      // Run all CSS through the Tailwind CSS v4 Turbopack loader.
       "*.css": {
         loaders: ["@tailwindcss/turbopack"],
         as: "*.css",

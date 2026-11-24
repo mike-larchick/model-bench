@@ -1,9 +1,15 @@
 "use client";
 
+/**
+ * Prompt textarea and submit button. Submits on click or Cmd/Ctrl+Enter.
+ * Fully controlled: the parent owns the text and the loading state.
+ */
 interface PromptInputProps {
   value: string;
   onChange: (value: string) => void;
+  /** Called when the user submits. The parent decides whether to proceed. */
   onSubmit: () => void;
+  /** True while a comparison is running. Disables input and shows a spinner. */
   loading: boolean;
 }
 
@@ -13,6 +19,7 @@ export default function PromptInput({
   onSubmit,
   loading,
 }: PromptInputProps) {
+  // Plain Enter inserts a newline. Cmd/Ctrl+Enter submits, matching common chat UIs.
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();

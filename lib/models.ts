@@ -1,3 +1,10 @@
+/**
+ * Curated fallback model list and cost math.
+ *
+ * The app normally uses the live catalog from lib/catalog.ts. This list is only
+ * used when OpenRouter's models endpoint is unreachable, so the playground still
+ * works offline or during an outage.
+ */
 import type { ModelConfig } from "@/types";
 
 // IDs and pricing verified against https://openrouter.ai/api/v1/models
@@ -25,10 +32,16 @@ export const MODELS: ModelConfig[] = [
   { id: "mistralai/mistral-small-2603", name: "Mistral Small 4", inputPer1k: 0.00015, outputPer1k: 0.0006 },
 ];
 
+/** Looks up a model in the curated fallback list. */
 export function getModelById(id: string): ModelConfig | undefined {
   return MODELS.find((m) => m.id === id);
 }
 
+/**
+ * Estimated USD cost of one request:
+ *   (prompt tokens / 1000) x input price + (completion tokens / 1000) x output price
+ * This uses list prices, so treat it as an estimate rather than a bill.
+ */
 export function calculateCost(
   model: ModelConfig,
   promptTokens: number,

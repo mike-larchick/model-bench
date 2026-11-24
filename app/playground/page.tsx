@@ -1,5 +1,17 @@
 "use client";
 
+/**
+ * Playground (client component): pick up to three models, enter a prompt, and
+ * compare the responses side by side.
+ *
+ * Data flow:
+ *   1. On sign-in, load the live model list from GET /api/models.
+ *   2. On "Compare", POST { prompt, models } to /api/compare.
+ *   3. Render one ResponseCard per selected model from the returned results.
+ *
+ * Access control: proxy.ts redirects signed-out users before this page loads.
+ * The session check below is a second guard for client-side navigation.
+ */
 import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -9,6 +21,9 @@ import PromptInput from "@/components/PromptInput";
 import ComparisonGrid from "@/components/ComparisonGrid";
 import type { CompareResult, ModelConfig } from "@/types";
 
+// Starting selection: the cheap tier from three different providers, so a first
+// comparison costs a fraction of a cent. Any ID that has been retired is
+// replaced automatically once the live catalog loads.
 const DEFAULT_MODELS = [
   "openai/gpt-6-luna",
   "anthropic/claude-haiku-5.5",
@@ -25,9 +40,10 @@ export default function PlaygroundPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Full model catalog for the dropdowns. Empty until /api/models responds.
   const [models, setModels] = useState<ModelConfig[]>([]);
 
-  // Load the live model catalog and drop any default that's been retired
+  // Load the live model catalog and drop any default that's been retired.
   useEffect(() => {
     if (status !== "authenticated") return;
     let cancelled = false;
@@ -36,6 +52,8 @@ export default function PlaygroundPage() {
       .then((list: ModelConfig[]) => {
         if (cancelled) return;
         setModels(list);
+        // Keep the selections that still exist, then fill any gaps with the
+        // newest available models, preserving the number of selector slots.
         const ids = new Set(list.map((m) => m.id));
         setSelectedModels((prev) => {
           const kept = prev.filter((id) => ids.has(id));
@@ -44,12 +62,13 @@ export default function PlaygroundPage() {
         });
       })
       .catch((e) => !cancelled && setError(`Could not load models: ${e.message}`));
+    // Ignore the response if the component unmounts before it arrives.
     return () => {
       cancelled = true;
     };
   }, [status]);
 
-  // Redirect if not authenticated
+  // Client-side guard: send signed-out users back to the landing page.
   useEffect(() => {
     if (status === "unauthenticated") {
       router.replace("/");
@@ -72,6 +91,7 @@ export default function PlaygroundPage() {
 
   if (!session) return null;
 
+  // Swap the model in one selector slot.
   const handleModelChange = (index: number, value: string) => {
     setSelectedModels((prev) => {
       const updated = [...prev];
@@ -80,6 +100,7 @@ export default function PlaygroundPage() {
     });
   };
 
+  // Add a slot (max 3), pre-filled with the newest model not already selected.
   const addModel = () => {
     if (selectedModels.length < 3) {
       const next =
@@ -89,12 +110,15 @@ export default function PlaygroundPage() {
     }
   };
 
+  // Remove a slot, always keeping at least one.
   const removeModel = (index: number) => {
     if (selectedModels.length > 1) {
       setSelectedModels((prev) => prev.filter((_, i) => i !== index));
     }
   };
 
+  // Run the comparison. The guard clause also prevents double submits while a
+  // request is in flight (Cmd+Enter or a double click).
   const handleCompare = async () => {
     if (!prompt.trim() || loading) return;
     setLoading(true);

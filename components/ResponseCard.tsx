@@ -1,13 +1,23 @@
 "use client";
 
+/**
+ * One model's result card. Renders one of four states:
+ *   loading -> animated skeleton
+ *   no result yet -> empty placeholder
+ *   error -> red card with the error message
+ *   success -> response text plus latency, token and cost stats
+ */
 import type { CompareResult } from "@/types";
 
 interface ResponseCardProps {
+  /** Undefined until the comparison finishes. */
   result?: CompareResult;
   loading?: boolean;
+  /** Shown on the skeleton before a result (with its own name) exists. */
   modelName?: string;
 }
 
+/** Placeholder shown while the request is in flight. */
 function SkeletonCard({ modelName }: { modelName?: string }) {
   return (
     <div className="flex flex-col gap-4 rounded-xl border border-zinc-700 bg-zinc-900 p-5 animate-pulse">
@@ -78,6 +88,8 @@ export default function ResponseCard({
     );
   }
 
+  // Most requests cost fractions of a cent. Below $0.001 show milli-dollars
+  // (suffix "m", so "$0.1215m" is $0.0001215) to avoid a wall of leading zeros.
   const costDisplay =
     result.estimatedCost < 0.001
       ? `$${(result.estimatedCost * 1000).toFixed(4)}m`
@@ -120,6 +132,7 @@ export default function ResponseCard({
   );
 }
 
+/** A small label/value pair in the stats footer. `highlight` marks the cost. */
 function Stat({
   label,
   value,

@@ -1,8 +1,16 @@
+/**
+ * Landing page and sign-in screen (server component).
+ *
+ * Signed-in users are redirected straight to the playground. Everyone else sees
+ * the pitch and a "Sign in with GitHub" button.
+ */
 import { redirect } from "next/navigation";
 import { auth, signIn } from "@/auth";
 import { connection } from "next/server";
 
 export default async function LandingPage() {
+  // Opt out of static prerendering. This page depends on the per-request
+  // session cookie, so it must render at request time.
   await connection();
   const session = await auth();
   if (session) {
@@ -56,7 +64,8 @@ export default async function LandingPage() {
           </span>
         </div>
 
-        {/* Sign-in form */}
+        {/* Sign-in form. A server action starts the GitHub OAuth flow, so no
+            client JavaScript is needed and the form works as a plain POST. */}
         <form
           action={async () => {
             "use server";
