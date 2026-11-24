@@ -19,6 +19,7 @@ import { useEffect } from "react";
 import ModelSelector from "@/components/ModelSelector";
 import PromptInput from "@/components/PromptInput";
 import ComparisonGrid from "@/components/ComparisonGrid";
+import { MAX_MODELS } from "@/lib/limits";
 import type { CompareResult, ModelConfig } from "@/types";
 
 // Starting selection: the cheap tier from three different providers, so a first
@@ -100,9 +101,9 @@ export default function PlaygroundPage() {
     });
   };
 
-  // Add a slot (max 3), pre-filled with the newest model not already selected.
+  // Add a slot (up to MAX_MODELS), pre-filled with the newest model not already selected.
   const addModel = () => {
-    if (selectedModels.length < 3) {
+    if (selectedModels.length < MAX_MODELS) {
       const next =
         models.find((m) => !selectedModels.includes(m.id))?.id ??
         "deepseek/deepseek-v4.1-flash";
@@ -187,7 +188,7 @@ export default function PlaygroundPage() {
             <div>
               <div className="mb-3 flex items-center justify-between">
                 <h2 className="text-sm font-semibold text-zinc-300">Models</h2>
-                {selectedModels.length < 3 && (
+                {selectedModels.length < MAX_MODELS && (
                   <button
                     onClick={addModel}
                     className="text-xs text-indigo-400 hover:text-indigo-300 transition flex items-center gap-1"

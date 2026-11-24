@@ -4,6 +4,8 @@
  * Prompt textarea and submit button. Submits on click or Cmd/Ctrl+Enter.
  * Fully controlled: the parent owns the text and the loading state.
  */
+import { MAX_PROMPT_CHARS } from "@/lib/limits";
+
 interface PromptInputProps {
   value: string;
   onChange: (value: string) => void;
@@ -38,9 +40,15 @@ export default function PromptInput({
         onKeyDown={handleKeyDown}
         placeholder="Enter a prompt to compare across models… (⌘+Enter to submit)"
         rows={4}
+        // Mirrors the server-side cap in /api/compare so users can't type past it.
+        maxLength={MAX_PROMPT_CHARS}
         disabled={loading}
         className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-500 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 transition"
       />
+      {/* Character counter so the limit isn't a surprise. */}
+      <p className="self-end text-xs text-zinc-500">
+        {value.length.toLocaleString()} / {MAX_PROMPT_CHARS.toLocaleString()}
+      </p>
       <button
         onClick={onSubmit}
         disabled={loading || !value.trim()}
