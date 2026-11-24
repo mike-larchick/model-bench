@@ -17,6 +17,19 @@ interface ResponseCardProps {
   modelName?: string;
 }
 
+/**
+ * Formats an estimated cost in plain dollars.
+ *
+ * Most requests cost a small fraction of a cent, so amounts under a cent keep
+ * six decimals ("$0.000037"). That keeps cheap models distinguishable from each
+ * other, which two decimals or a "<$0.0001" floor would hide. Larger amounts
+ * use three decimals, and a free or unpriced model shows "$0.00".
+ */
+function formatCost(usd: number): string {
+  if (usd <= 0) return "$0.00";
+  return usd < 0.01 ? `$${usd.toFixed(6)}` : `$${usd.toFixed(3)}`;
+}
+
 /** Placeholder shown while the request is in flight. */
 function SkeletonCard({ modelName }: { modelName?: string }) {
   return (
@@ -88,12 +101,7 @@ export default function ResponseCard({
     );
   }
 
-  // Most requests cost fractions of a cent. Below $0.001 show milli-dollars
-  // (suffix "m", so "$0.1215m" is $0.0001215) to avoid a wall of leading zeros.
-  const costDisplay =
-    result.estimatedCost < 0.001
-      ? `$${(result.estimatedCost * 1000).toFixed(4)}m`
-      : `$${result.estimatedCost.toFixed(5)}`;
+  const costDisplay = formatCost(result.estimatedCost);
 
   return (
     <div className="flex flex-col gap-4 rounded-xl border border-zinc-700 bg-zinc-900 p-5">
