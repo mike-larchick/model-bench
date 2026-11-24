@@ -1,42 +1,28 @@
 import type { ModelConfig } from "@/types";
 
+// IDs and pricing verified against https://openrouter.ai/api/v1/models
+// (prices are USD per 1K tokens). Re-check periodically; OpenRouter retires models.
 export const MODELS: ModelConfig[] = [
-  {
-    id: "openai/gpt-4o",
-    name: "GPT-4o",
-    inputPer1k: 0.005,
-    outputPer1k: 0.015,
-  },
-  {
-    id: "openai/gpt-4o-mini",
-    name: "GPT-4o Mini",
-    inputPer1k: 0.00015,
-    outputPer1k: 0.0006,
-  },
-  {
-    id: "anthropic/claude-3.5-sonnet",
-    name: "Claude 3.5 Sonnet",
-    inputPer1k: 0.003,
-    outputPer1k: 0.015,
-  },
-  {
-    id: "anthropic/claude-3-haiku",
-    name: "Claude 3 Haiku",
-    inputPer1k: 0.00025,
-    outputPer1k: 0.00125,
-  },
-  {
-    id: "meta-llama/llama-3.1-70b-instruct",
-    name: "Llama 3.1 70B",
-    inputPer1k: 0.0009,
-    outputPer1k: 0.0009,
-  },
-  {
-    id: "google/gemini-flash-1.5",
-    name: "Gemini Flash 1.5",
-    inputPer1k: 0.000075,
-    outputPer1k: 0.0003,
-  },
+  // OpenAI
+  { id: "openai/gpt-6-luna", name: "GPT-6 Luna", inputPer1k: 0.0001, outputPer1k: 0.0005 },
+  { id: "openai/gpt-6.1-terra", name: "GPT-6.1 Terra", inputPer1k: 0.001, outputPer1k: 0.005 },
+  { id: "openai/gpt-6.2-sol", name: "GPT-6.2 Sol", inputPer1k: 0.002, outputPer1k: 0.01 },
+
+  // Anthropic
+  { id: "anthropic/claude-haiku-5.5", name: "Claude Haiku 5.5", inputPer1k: 0.0001, outputPer1k: 0.0005 },
+  { id: "anthropic/claude-sonnet-5.5", name: "Claude Sonnet 5.5", inputPer1k: 0.002, outputPer1k: 0.01 },
+
+  // Google
+  { id: "google/gemini-4-carbon", name: "Gemini 4 Carbon", inputPer1k: 0.002, outputPer1k: 0.01 },
+  { id: "google/gemini-4-hydrogen", name: "Gemini 4 Hydrogen", inputPer1k: 0.0015, outputPer1k: 0.0075 },
+
+  // Meta
+  { id: "meta-llama/llama-4-scout", name: "Llama 4 Scout", inputPer1k: 0.0001, outputPer1k: 0.0003 },
+  { id: "meta-llama/llama-4-maverick", name: "Llama 4 Maverick", inputPer1k: 0.00035, outputPer1k: 0.001 },
+
+  // Others
+  { id: "deepseek/deepseek-v4.1-flash", name: "DeepSeek V4.1 Flash", inputPer1k: 0.00005, outputPer1k: 0.000199 },
+  { id: "mistralai/mistral-small-2603", name: "Mistral Small 4", inputPer1k: 0.00015, outputPer1k: 0.0006 },
 ];
 
 export function getModelById(id: string): ModelConfig | undefined {

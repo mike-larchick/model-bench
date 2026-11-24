@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Model Bench — Compare AI Models Side by Side",
   description:
-    "Compare AI models side by side, powered by OpenRouter. Test GPT-4o, Claude, Llama, Gemini, and more in a single prompt.",
+    "Compare AI models side by side, powered by OpenRouter. Test GPT, Claude, Llama, Gemini, DeepSeek, and more in a single prompt.",
 };
 
 export default function RootLayout({

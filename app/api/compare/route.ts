@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { queryModel } from "@/lib/openrouter";
+import { getModelCatalog } from "@/lib/catalog";
 import type { CompareRequest } from "@/types";
 
 export async function POST(req: NextRequest) {
@@ -32,8 +33,11 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const catalog = await getModelCatalog();
+  const byId = new Map(catalog.map((m) => [m.id, m]));
+
   const results = await Promise.all(
-    models.map((model) => queryModel(model, prompt.trim()))
+    models.map((model) => queryModel(model, prompt.trim(), byId.get(model)))
   );
 
   return NextResponse.json(results);

@@ -1,17 +1,18 @@
 "use client";
 
 import ResponseCard from "./ResponseCard";
-import type { CompareResult } from "@/types";
-import { MODELS } from "@/lib/models";
+import type { CompareResult, ModelConfig } from "@/types";
 
 interface ComparisonGridProps {
   selectedModels: string[];
+  models: ModelConfig[];
   results: CompareResult[];
   loading: boolean;
 }
 
 export default function ComparisonGrid({
   selectedModels,
+  models,
   results,
   loading,
 }: ComparisonGridProps) {
@@ -19,7 +20,7 @@ export default function ComparisonGrid({
     results.find((r) => r.model === modelId);
 
   const getModelName = (modelId: string) =>
-    MODELS.find((m) => m.id === modelId)?.name ?? modelId;
+    models.find((m) => m.id === modelId)?.name ?? modelId;
 
   const cols =
     selectedModels.length === 1

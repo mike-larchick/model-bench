@@ -1,6 +1,6 @@
 # Model Bench
 
-**Model Bench** is a side-by-side AI model comparison tool built with Next.js and the [OpenRouter](https://openrouter.ai) API. Enter a single prompt and instantly compare responses, latency, token usage, and estimated cost across up to three models — GPT-4o, Claude 3.5 Sonnet, Llama 3.1 70B, Gemini Flash, and more — all in one clean, dark-themed interface.
+**Model Bench** is a side-by-side AI model comparison tool built with Next.js and the [OpenRouter](https://openrouter.ai) API. Enter a single prompt and instantly compare responses, latency, token usage, and estimated cost across up to three models — GPT-6, Claude 5.5, Llama 4, Gemini 4, DeepSeek, and more — all in one clean, dark-themed interface.
 
 [Live Demo](https://model-bench.vercel.app)
 

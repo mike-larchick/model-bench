@@ -1,13 +1,14 @@
-import type { CompareResult, ModelUsage } from "@/types";
+import type { CompareResult, ModelConfig, ModelUsage } from "@/types";
 import { getModelById, calculateCost } from "@/lib/models";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 export async function queryModel(
   model: string,
-  prompt: string
+  prompt: string,
+  config?: ModelConfig
 ): Promise<CompareResult> {
-  const modelConfig = getModelById(model);
+  const modelConfig = config ?? getModelById(model);
   const modelName = modelConfig?.name ?? model;
 
   const start = Date.now();
@@ -25,6 +26,7 @@ export async function queryModel(
       body: JSON.stringify({
         model,
         messages: [{ role: "user", content: prompt }],
+        max_tokens: 1024,
       }),
     });
 

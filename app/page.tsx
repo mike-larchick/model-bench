@@ -1,10 +1,9 @@
 import { redirect } from "next/navigation";
 import { auth, signIn } from "@/auth";
-
-// This page checks the session at runtime — block static prerendering
-export const instant = false;
+import { connection } from "next/server";
 
 export default async function LandingPage() {
+  await connection();
   const session = await auth();
   if (session) {
     redirect("/playground");
@@ -40,10 +39,10 @@ export default async function LandingPage() {
         {/* Feature pills */}
         <div className="flex flex-wrap justify-center gap-2">
           {[
-            "GPT-4o",
-            "Claude 3.5 Sonnet",
-            "Llama 3.1 70B",
-            "Gemini Flash",
+            "GPT-6",
+            "Claude 5.5",
+            "Llama 4",
+            "Gemini 4",
           ].map((m) => (
             <span
               key={m}

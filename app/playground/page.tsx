@@ -7,12 +7,12 @@ import { useEffect } from "react";
 import ModelSelector from "@/components/ModelSelector";
 import PromptInput from "@/components/PromptInput";
 import ComparisonGrid from "@/components/ComparisonGrid";
-import type { CompareResult } from "@/types";
+import type { CompareResult, ModelConfig } from "@/types";
 
 const DEFAULT_MODELS = [
-  "openai/gpt-4o",
-  "anthropic/claude-3.5-sonnet",
-  "meta-llama/llama-3.1-70b-instruct",
+  "openai/gpt-6-luna",
+  "anthropic/claude-haiku-5.5",
+  "meta-llama/llama-4-scout",
 ];
 
 export default function PlaygroundPage() {
@@ -24,6 +24,30 @@ export default function PlaygroundPage() {
   const [results, setResults] = useState<CompareResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [models, setModels] = useState<ModelConfig[]>([]);
+
+  // Load the live model catalog and drop any default that's been retired
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    let cancelled = false;
+    fetch("/api/models")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
+      .then((list: ModelConfig[]) => {
+        if (cancelled) return;
+        setModels(list);
+        const ids = new Set(list.map((m) => m.id));
+        setSelectedModels((prev) => {
+          const kept = prev.filter((id) => ids.has(id));
+          const fillers = list.map((m) => m.id).filter((id) => !kept.includes(id));
+          return [...kept, ...fillers].slice(0, prev.length);
+        });
+      })
+      .catch((e) => !cancelled && setError(`Could not load models: ${e.message}`));
+    return () => {
+      cancelled = true;
+    };
+  }, [status]);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -58,7 +82,10 @@ export default function PlaygroundPage() {
 
   const addModel = () => {
     if (selectedModels.length < 3) {
-      setSelectedModels((prev) => [...prev, "openai/gpt-4o-mini"]);
+      const next =
+        models.find((m) => !selectedModels.includes(m.id))?.id ??
+        "deepseek/deepseek-v4.1-flash";
+      setSelectedModels((prev) => [...prev, next]);
     }
   };
 
@@ -152,6 +179,7 @@ export default function PlaygroundPage() {
                       <ModelSelector
                         label={`Model ${i + 1}`}
                         value={modelId}
+                        models={models}
                         onChange={(v) => handleModelChange(i, v)}
                       />
                     </div>
@@ -195,6 +223,7 @@ export default function PlaygroundPage() {
               </h2>
               <ComparisonGrid
                 selectedModels={selectedModels}
+                models={models}
                 results={results}
                 loading={loading}
               />
